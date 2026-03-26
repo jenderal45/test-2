@@ -1,1489 +1,1025 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Exmind Digital — 3D Interactive Digital Technology</title>
-  <meta name="description" content="Exmind Digital adalah one stop solution digital technology dengan pengalaman 3D interaktif: Website & Apps, Social Media & E-commerce Management, Digital Ads." />
-  
-  <!-- Three.js & GSAP -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-  
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-    
-    :root{
-      --bg: #020408;
-      --bg2: #0a0f1a;
-      --card: rgba(255,255,255,.03);
-      --card2: rgba(255,255,255,.08);
-      --text: #ffffff;
-      --muted: rgba(255,255,255,.6);
-      --muted2: rgba(255,255,255,.4);
-      --border: rgba(255,255,255,.08);
-      
-      --accent: #00f0ff;
-      --accent2: #bc13fe;
-      --accent3: #ff006e;
-      --good: #39ff88;
-      
-      --shadow: 0 25px 80px rgba(0,0,0,.6);
-      --radius: 24px;
-      --container: 1280px;
-      --pad: 24px;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Exmind Digital — One Stop Solution for Digital Technology</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --ink:#0a0a0f;
+  --ink2:#14141e;
+  --glass:rgba(255,255,255,0.04);
+  --glass2:rgba(255,255,255,0.08);
+  --border:rgba(255,255,255,0.1);
+  --accent:#6c63ff;
+  --accent2:#ff6b9d;
+  --accent3:#00d4aa;
+  --text:#f0eeff;
+  --muted:rgba(240,238,255,0.5);
+}
+html{scroll-behavior:smooth}
+body{
+  background:#0a0a0f;
+  color:var(--text);
+  font-family:'DM Sans',sans-serif;
+  overflow-x:hidden;
+  cursor:none;
+}
+#cursor{
+  width:12px;height:12px;
+  background:var(--accent);
+  border-radius:50%;
+  position:fixed;z-index:9999;
+  pointer-events:none;
+  transition:transform 0.15s ease,background 0.3s;
+  mix-blend-mode:screen;
+}
+#cursor-ring{
+  width:40px;height:40px;
+  border:1px solid rgba(108,99,255,0.5);
+  border-radius:50%;
+  position:fixed;z-index:9998;
+  pointer-events:none;
+  transition:all 0.08s ease;
+}
+canvas#bg{
+  position:fixed;top:0;left:0;
+  width:100%;height:100%;
+  z-index:0;
+}
+nav{
+  position:fixed;top:0;left:0;right:0;
+  z-index:100;
+  padding:1.5rem 4rem;
+  display:flex;align-items:center;justify-content:space-between;
+  background:linear-gradient(180deg,rgba(10,10,15,0.9) 0%,transparent 100%);
+  backdrop-filter:blur(10px);
+}
+.logo{
+  font-family:'Syne',sans-serif;
+  font-weight:800;font-size:1.4rem;
+  letter-spacing:-0.02em;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+.nav-links{display:flex;gap:2.5rem;list-style:none}
+.nav-links a{
+  color:var(--muted);
+  text-decoration:none;
+  font-size:0.85rem;
+  font-weight:400;
+  letter-spacing:0.05em;
+  text-transform:uppercase;
+  transition:color 0.3s;
+}
+.nav-links a:hover{color:var(--text)}
+.nav-cta{
+  padding:0.6rem 1.5rem;
+  background:var(--accent);
+  color:#fff;border:none;
+  border-radius:100px;
+  font-family:'DM Sans',sans-serif;
+  font-size:0.85rem;font-weight:500;
+  cursor:none;
+  transition:transform 0.2s,box-shadow 0.3s;
+  text-decoration:none;
+}
+.nav-cta:hover{
+  transform:translateY(-2px);
+  box-shadow:0 10px 40px rgba(108,99,255,0.4);
+}
 
-    *{box-sizing:border-box; margin:0; padding:0}
-    html{scroll-behavior:smooth}
-    body{
-      font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.6;
-      overflow-x:hidden;
-      cursor: none;
-    }
+/* HERO */
+#hero{
+  position:relative;z-index:10;
+  min-height:100vh;
+  display:flex;align-items:center;
+  padding:0 4rem;
+  padding-top:120px;
+}
+.hero-content{max-width:680px}
+.badge{
+  display:inline-flex;align-items:center;gap:0.5rem;
+  padding:0.4rem 1rem;
+  border:1px solid var(--border);
+  border-radius:100px;
+  font-size:0.75rem;
+  color:var(--muted);
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  margin-bottom:2rem;
+  background:var(--glass);
+  backdrop-filter:blur(10px);
+}
+.badge-dot{
+  width:6px;height:6px;
+  background:var(--accent3);
+  border-radius:50%;
+  animation:pulse 2s infinite;
+}
+@keyframes pulse{
+  0%,100%{opacity:1;transform:scale(1)}
+  50%{opacity:0.5;transform:scale(0.8)}
+}
+h1{
+  font-family:'Syne',sans-serif;
+  font-size:clamp(3rem,6vw,5.5rem);
+  font-weight:800;
+  line-height:1.0;
+  letter-spacing:-0.03em;
+  margin-bottom:1.5rem;
+}
+h1 .line1{display:block;color:var(--text)}
+h1 .line2{
+  display:block;
+  background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 50%,var(--accent3) 100%);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-size:200% 200%;
+  animation:gradshift 4s ease infinite;
+}
+@keyframes gradshift{
+  0%{background-position:0% 50%}
+  50%{background-position:100% 50%}
+  100%{background-position:0% 50%}
+}
+.hero-sub{
+  font-size:1.05rem;
+  line-height:1.7;
+  color:var(--muted);
+  font-weight:300;
+  max-width:520px;
+  margin-bottom:3rem;
+}
+.hero-actions{display:flex;gap:1rem;flex-wrap:wrap;align-items:center}
+.btn-primary{
+  padding:0.9rem 2.5rem;
+  background:var(--accent);
+  color:#fff;border:none;
+  border-radius:100px;
+  font-family:'DM Sans',sans-serif;
+  font-size:1rem;font-weight:500;
+  cursor:none;
+  text-decoration:none;
+  display:inline-block;
+  transition:all 0.3s;
+  position:relative;overflow:hidden;
+}
+.btn-primary::after{
+  content:'';
+  position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,0.2),transparent);
+  opacity:0;transition:opacity 0.3s;
+}
+.btn-primary:hover::after{opacity:1}
+.btn-primary:hover{
+  transform:translateY(-3px);
+  box-shadow:0 20px 60px rgba(108,99,255,0.5);
+}
+.btn-ghost{
+  padding:0.9rem 2.5rem;
+  background:transparent;
+  color:var(--text);
+  border:1px solid var(--border);
+  border-radius:100px;
+  font-family:'DM Sans',sans-serif;
+  font-size:1rem;font-weight:400;
+  cursor:none;
+  text-decoration:none;
+  display:inline-flex;align-items:center;gap:0.5rem;
+  transition:all 0.3s;
+  backdrop-filter:blur(10px);
+}
+.btn-ghost:hover{
+  background:var(--glass2);
+  border-color:rgba(255,255,255,0.2);
+}
+.hero-pills{
+  display:flex;gap:1rem;flex-wrap:wrap;
+  margin-top:3rem;
+}
+.pill{
+  display:flex;align-items:center;gap:0.5rem;
+  padding:0.5rem 1rem;
+  background:var(--glass);
+  border:1px solid var(--border);
+  border-radius:100px;
+  font-size:0.8rem;
+  color:var(--muted);
+  backdrop-filter:blur(10px);
+}
+.pill-icon{font-size:1rem}
 
-    /* Custom Cursor */
-    .cursor{
-      width: 20px;
-      height: 20px;
-      border: 2px solid var(--accent);
-      border-radius: 50%;
-      position: fixed;
-      pointer-events: none;
-      z-index: 9999;
-      transition: transform 0.15s ease, background 0.15s ease;
-      mix-blend-mode: difference;
-    }
-    .cursor.hover{
-      transform: scale(2);
-      background: var(--accent);
-    }
-    .cursor-dot{
-      width: 6px;
-      height: 6px;
-      background: var(--accent);
-      border-radius: 50%;
-      position: fixed;
-      pointer-events: none;
-      z-index: 9999;
-      transition: transform 0.05s ease;
-    }
+/* FLOATING CARDS LAYER */
+.floating-cards{
+  position:absolute;right:0;top:0;bottom:0;
+  width:55%;
+  pointer-events:none;
+  z-index:5;
+}
+.fcard{
+  position:absolute;
+  background:var(--glass);
+  border:1px solid var(--border);
+  border-radius:20px;
+  backdrop-filter:blur(20px);
+  padding:1.5rem;
+  animation:float 6s ease-in-out infinite;
+}
+.fcard:nth-child(1){
+  top:20%;right:8%;
+  width:220px;
+  animation-delay:0s;
+}
+.fcard:nth-child(2){
+  top:45%;right:28%;
+  width:180px;
+  animation-delay:1.5s;
+}
+.fcard:nth-child(3){
+  top:65%;right:10%;
+  width:200px;
+  animation-delay:3s;
+}
+@keyframes float{
+  0%,100%{transform:translateY(0) rotate(-1deg)}
+  50%{transform:translateY(-20px) rotate(1deg)}
+}
+.fcard-label{
+  font-size:0.65rem;text-transform:uppercase;
+  letter-spacing:0.1em;color:var(--muted);margin-bottom:0.75rem;
+}
+.fcard-val{
+  font-family:'Syne',sans-serif;
+  font-size:1.8rem;font-weight:800;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.fcard-icon{
+  font-size:2rem;margin-bottom:0.5rem;
+}
+.fcard-title{
+  font-size:0.9rem;font-weight:500;
+  margin-bottom:0.25rem;
+}
+.fcard-sub{font-size:0.75rem;color:var(--muted)}
+.sparkline{
+  display:flex;align-items:flex-end;gap:3px;height:40px;margin-top:0.75rem;
+}
+.sparkline span{
+  flex:1;background:linear-gradient(180deg,var(--accent),rgba(108,99,255,0.2));
+  border-radius:3px;
+}
 
-    /* 3D Canvas Background */
-    #canvas-container{
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: -1;
-      pointer-events: none;
-    }
+/* SECTIONS */
+section{
+  position:relative;z-index:10;
+  padding:8rem 4rem;
+}
+.section-label{
+  font-size:0.75rem;text-transform:uppercase;letter-spacing:0.15em;
+  color:var(--accent);margin-bottom:1rem;font-weight:500;
+}
+.section-title{
+  font-family:'Syne',sans-serif;
+  font-size:clamp(2rem,4vw,3.5rem);
+  font-weight:800;letter-spacing:-0.02em;
+  line-height:1.1;margin-bottom:1.5rem;
+}
+.section-sub{
+  font-size:1.05rem;color:var(--muted);
+  font-weight:300;max-width:540px;line-height:1.7;
+}
 
-    /* Navigation */
-    .nav{
-      position: fixed;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 1000;
-      width: calc(100% - 40px);
-      max-width: 1200px;
-    }
-    .nav-inner{
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 16px 28px;
-      background: rgba(255,255,255,.03);
-      backdrop-filter: blur(20px);
-      border: 1px solid var(--border);
-      border-radius: 100px;
-      box-shadow: 0 8px 32px rgba(0,0,0,.3);
-    }
-    .brand{
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-weight: 700;
-      font-size: 14px;
-      letter-spacing: 0.5px;
-    }
-    .brand img{
-      width: 40px;
-      height: 40px;
-      filter: drop-shadow(0 0 20px rgba(0,240,255,.4));
-      animation: float 6s ease-in-out infinite;
-    }
-    @keyframes float{
-      0%,100%{transform: translateY(0) rotateY(0deg)}
-      50%{transform: translateY(-10px) rotateY(180deg)}
-    }
-    .nav-links{
-      display: flex;
-      gap: 8px;
-    }
-    .nav-links a{
-      padding: 10px 20px;
-      border-radius: 100px;
-      font-size: 13px;
-      color: var(--muted);
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-    }
-    .nav-links a::before{
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      z-index: -1;
-    }
-    .nav-links a:hover{
-      color: white;
-      transform: translateY(-2px);
-    }
-    .nav-links a:hover::before{
-      opacity: 0.2;
-    }
-    .nav-cta{
-      display: flex;
-      gap: 12px;
-      align-items: center;
-    }
-    .pill{
-      padding: 10px 20px;
-      border-radius: 100px;
-      border: 1px solid var(--border);
-      background: rgba(255,255,255,.05);
-      font-size: 12px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-    .pill:hover{
-      border-color: var(--accent);
-      box-shadow: 0 0 20px rgba(0,240,255,.2);
-    }
+/* SERVICES GRID */
+.services-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:1.5rem;
+  margin-top:4rem;
+}
+.scard{
+  background:var(--glass);
+  border:1px solid var(--border);
+  border-radius:24px;
+  padding:2rem;
+  position:relative;
+  overflow:hidden;
+  transition:transform 0.4s,border-color 0.4s,box-shadow 0.4s;
+  cursor:none;
+}
+.scard::before{
+  content:'';
+  position:absolute;
+  inset:-1px;
+  border-radius:24px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2),var(--accent3));
+  opacity:0;
+  transition:opacity 0.4s;
+  z-index:-1;
+}
+.scard:hover{
+  transform:translateY(-8px) scale(1.02);
+  border-color:transparent;
+  box-shadow:0 30px 80px rgba(108,99,255,0.25);
+}
+.scard:hover::before{opacity:1}
+.scard-num{
+  font-family:'Syne',sans-serif;
+  font-size:3rem;font-weight:800;
+  color:rgba(255,255,255,0.05);
+  position:absolute;top:1rem;right:1.5rem;
+  line-height:1;
+}
+.scard-icon{
+  width:52px;height:52px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border-radius:14px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.4rem;
+  margin-bottom:1.5rem;
+}
+.scard-title{
+  font-family:'Syne',sans-serif;
+  font-size:1.15rem;font-weight:700;
+  margin-bottom:0.75rem;
+}
+.scard-desc{
+  font-size:0.875rem;color:var(--muted);line-height:1.6;font-weight:300;
+}
 
-    /* Buttons */
-    .btn{
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 14px 28px;
-      border-radius: 100px;
-      font-weight: 600;
-      font-size: 13px;
-      border: none;
-      cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      position: relative;
-      overflow: hidden;
-    }
-    .btn::before{
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, transparent, rgba(255,255,255,.2), transparent);
-      transform: translateX(-100%);
-      transition: transform 0.6s ease;
-    }
-    .btn:hover::before{
-      transform: translateX(100%);
-    }
-    .btn-primary{
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      color: #000;
-      box-shadow: 0 10px 40px rgba(0,240,255,.3);
-    }
-    .btn-primary:hover{
-      transform: translateY(-3px) scale(1.02);
-      box-shadow: 0 20px 60px rgba(0,240,255,.4);
-    }
-    .btn-ghost{
-      background: rgba(255,255,255,.05);
-      color: white;
-      border: 1px solid var(--border);
-    }
-    .btn-ghost:hover{
-      background: rgba(255,255,255,.1);
-      border-color: var(--accent);
-    }
+/* ECOSYSTEM */
+.ecosystem-wrapper{
+  position:relative;
+  display:flex;align-items:center;justify-content:center;
+  min-height:600px;margin-top:4rem;
+}
+.eco-center{
+  position:relative;z-index:2;
+  width:160px;height:160px;
+  border-radius:50%;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  display:flex;align-items:center;justify-content:center;
+  flex-direction:column;
+  text-align:center;
+  padding:1rem;
+  box-shadow:0 0 80px rgba(108,99,255,0.5);
+}
+.eco-center-title{
+  font-family:'Syne',sans-serif;
+  font-size:0.85rem;font-weight:800;
+}
+.eco-center-sub{font-size:0.65rem;opacity:0.8;margin-top:0.25rem}
+.eco-ring{
+  position:absolute;
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:50%;
+  animation:spin 30s linear infinite;
+}
+.eco-ring:nth-child(2){width:340px;height:340px;animation-duration:40s}
+.eco-ring:nth-child(3){width:500px;height:500px;animation-direction:reverse;animation-duration:25s}
+.eco-ring:nth-child(4){width:660px;height:660px;animation-duration:50s}
+@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+.eco-dot{
+  position:absolute;
+  width:10px;height:10px;
+  border-radius:50%;
+  background:var(--accent);
+  box-shadow:0 0 10px var(--accent);
+}
+.eco-nodes{
+  position:absolute;
+  width:100%;height:100%;
+  z-index:3;
+}
+.eco-node{
+  position:absolute;
+  transform:translate(-50%,-50%);
+  background:var(--glass2);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:0.75rem 1.25rem;
+  text-align:center;
+  backdrop-filter:blur(20px);
+  transition:transform 0.3s,box-shadow 0.3s;
+  cursor:none;
+}
+.eco-node:hover{
+  transform:translate(-50%,-50%) scale(1.1);
+  box-shadow:0 10px 40px rgba(108,99,255,0.3);
+}
+.eco-node-tag{
+  font-size:0.6rem;text-transform:uppercase;letter-spacing:0.1em;
+  color:var(--accent3);margin-bottom:0.25rem;
+}
+.eco-node-name{
+  font-family:'Syne',sans-serif;
+  font-size:0.8rem;font-weight:700;
+}
 
-    /* Hero Section */
-    .hero{
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      padding: 140px 0 80px;
-      position: relative;
-      perspective: 1000px;
-    }
-    .hero-grid{
-      display: grid;
-      grid-template-columns: 1.2fr 1fr;
-      gap: 60px;
-      align-items: center;
-      max-width: var(--container);
-      margin: 0 auto;
-      padding: 0 var(--pad);
-      position: relative;
-      z-index: 2;
-    }
-    
-    /* 3D Floating Card */
-    .hero-3d-card{
-      position: relative;
-      width: 100%;
-      height: 500px;
-      transform-style: preserve-3d;
-      animation: cardFloat 8s ease-in-out infinite;
-    }
-    @keyframes cardFloat{
-      0%,100%{transform: translateY(0) rotateX(5deg) rotateY(-5deg)}
-      50%{transform: translateY(-20px) rotateX(10deg) rotateY(5deg)}
-    }
-    .card-3d-layer{
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(0,240,255,.1), rgba(188,19,254,.1));
-      border: 1px solid rgba(255,255,255,.1);
-      border-radius: 30px;
-      backdrop-filter: blur(20px);
-      transform: translateZ(0);
-    }
-    .card-3d-layer:nth-child(2){
-      transform: translateZ(30px) scale(0.95);
-      background: linear-gradient(135deg, rgba(0,240,255,.05), rgba(188,19,254,.05));
-    }
-    .card-3d-layer:nth-child(3){
-      transform: translateZ(60px) scale(0.9);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      gap: 24px;
-    }
-    .card-3d-layer:nth-child(3) img{
-      width: 200px;
-      filter: drop-shadow(0 0 40px rgba(0,240,255,.5));
-      animation: logoPulse 4s ease-in-out infinite;
-    }
-    @keyframes logoPulse{
-      0%,100%{transform: scale(1); filter: drop-shadow(0 0 40px rgba(0,240,255,.5))}
-      50%{transform: scale(1.05); filter: drop-shadow(0 0 60px rgba(188,19,254,.6))}
-    }
-    .hologram-ring{
-      position: absolute;
-      width: 300px;
-      height: 300px;
-      border: 2px solid rgba(0,240,255,.3);
-      border-radius: 50%;
-      animation: rotate 10s linear infinite;
-    }
-    .hologram-ring:nth-child(2){
-      width: 250px;
-      height: 250px;
-      border-color: rgba(188,19,254,.3);
-      animation-direction: reverse;
-      animation-duration: 15s;
-    }
-    @keyframes rotate{
-      from{transform: rotateX(60deg) rotateZ(0deg)}
-      to{transform: rotateX(60deg) rotateZ(360deg)}
-    }
+/* PORTFOLIO */
+.portfolio-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:1.5rem;
+  margin-top:4rem;
+}
+.pcard{
+  background:var(--glass);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:1.75rem;
+  display:flex;flex-direction:column;
+  gap:0.75rem;
+  transition:all 0.4s;
+  cursor:none;
+  text-decoration:none;color:var(--text);
+}
+.pcard:hover{
+  transform:translateY(-6px);
+  background:var(--glass2);
+  border-color:rgba(108,99,255,0.3);
+  box-shadow:0 20px 60px rgba(108,99,255,0.15);
+}
+.pcard-cat{
+  font-size:0.65rem;text-transform:uppercase;letter-spacing:0.12em;
+  color:var(--accent2);font-weight:500;
+}
+.pcard-name{
+  font-family:'Syne',sans-serif;
+  font-size:1.1rem;font-weight:700;
+}
+.pcard-url{
+  font-size:0.8rem;color:var(--muted);font-weight:300;
+}
+.pcard-arrow{
+  margin-top:auto;
+  align-self:flex-end;
+  width:36px;height:36px;
+  border-radius:50%;
+  border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  transition:all 0.3s;
+}
+.pcard:hover .pcard-arrow{
+  background:var(--accent);
+  border-color:var(--accent);
+}
 
-    /* Hero Content */
-    .badge{
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 20px;
-      background: rgba(0,240,255,.1);
-      border: 1px solid rgba(0,240,255,.3);
-      border-radius: 100px;
-      font-size: 12px;
-      color: var(--accent);
-      margin-bottom: 24px;
-      backdrop-filter: blur(10px);
-    }
-    .dot{
-      width: 8px;
-      height: 8px;
-      background: var(--good);
-      border-radius: 50%;
-      box-shadow: 0 0 10px var(--good);
-      animation: pulse 2s infinite;
-    }
-    @keyframes pulse{
-      0%,100%{opacity: 1}
-      50%{opacity: 0.5}
-    }
-    h1{
-      font-size: 64px;
-      line-height: 1.1;
-      font-weight: 800;
-      margin-bottom: 24px;
-      background: linear-gradient(135deg, #fff 0%, var(--accent) 50%, var(--accent2) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .lead{
-      font-size: 18px;
-      color: var(--muted);
-      margin-bottom: 32px;
-      max-width: 500px;
-    }
-    .hero-actions{
-      display: flex;
-      gap: 16px;
-      margin-bottom: 40px;
-    }
-    .trust-badges{
-      display: flex;
-      gap: 20px;
-      flex-wrap: wrap;
-    }
-    .trust-item{
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 12px 20px;
-      background: rgba(255,255,255,.03);
-      border: 1px solid var(--border);
-      border-radius: 100px;
-      font-size: 13px;
-      color: var(--muted);
-      transition: all 0.3s ease;
-    }
-    .trust-item:hover{
-      border-color: var(--accent);
-      transform: translateY(-2px);
-      background: rgba(0,240,255,.05);
-    }
+/* PROCESS */
+.process-steps{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:0;
+  margin-top:4rem;
+  position:relative;
+}
+.process-steps::before{
+  content:'';
+  position:absolute;
+  top:40px;left:10%;right:10%;height:1px;
+  background:linear-gradient(90deg,transparent,var(--accent),var(--accent2),var(--accent3),transparent);
+  z-index:0;
+}
+.pstep{
+  text-align:center;
+  padding:0 1.5rem;
+  position:relative;z-index:1;
+}
+.pstep-num{
+  width:80px;height:80px;
+  border-radius:50%;
+  background:var(--ink2);
+  border:2px solid var(--accent);
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 1.5rem;
+  font-family:'Syne',sans-serif;
+  font-size:1.5rem;font-weight:800;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  box-shadow:0 0 30px rgba(108,99,255,0.4);
+}
+.pstep-title{
+  font-family:'Syne',sans-serif;
+  font-size:1rem;font-weight:700;margin-bottom:0.5rem;
+}
+.pstep-desc{font-size:0.8rem;color:var(--muted);line-height:1.6;font-weight:300}
 
-    /* Section Styles */
-    section{
-      padding: 120px 0;
-      position: relative;
-    }
-    .container{
-      max-width: var(--container);
-      margin: 0 auto;
-      padding: 0 var(--pad);
-    }
-    .section-header{
-      text-align: center;
-      margin-bottom: 80px;
-    }
-    .section-title{
-      font-size: 48px;
-      font-weight: 800;
-      margin-bottom: 16px;
-      background: linear-gradient(135deg, #fff, var(--accent));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    .section-sub{
-      font-size: 18px;
-      color: var(--muted);
-      max-width: 600px;
-      margin: 0 auto;
-    }
+/* CONTACT */
+#contact{background:var(--ink2)}
+.contact-inner{
+  max-width:700px;margin:0 auto;text-align:center;
+}
+.contact-form{
+  margin-top:3rem;
+  display:flex;flex-direction:column;gap:1rem;
+  text-align:left;
+}
+.contact-row{display:flex;gap:1rem}
+.contact-row input{flex:1}
+input,textarea,select{
+  background:var(--glass);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:0.875rem 1.25rem;
+  color:var(--text);
+  font-family:'DM Sans',sans-serif;
+  font-size:0.9rem;
+  width:100%;
+  outline:none;
+  transition:border-color 0.3s,background 0.3s;
+}
+input:focus,textarea:focus{
+  border-color:var(--accent);
+  background:var(--glass2);
+}
+textarea{resize:vertical;min-height:120px}
+.contact-info{
+  display:flex;gap:2rem;justify-content:center;
+  margin-top:3rem;flex-wrap:wrap;
+}
+.cinfo-item{
+  display:flex;align-items:center;gap:0.75rem;
+  font-size:0.875rem;color:var(--muted);
+}
+.cinfo-icon{
+  width:36px;height:36px;
+  background:var(--glass);
+  border:1px solid var(--border);
+  border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1rem;
+}
 
-    /* 3D Cards Grid */
-    .grid-3d{
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 24px;
-      perspective: 1000px;
-    }
-    .card-3d{
-      position: relative;
-      background: rgba(255,255,255,.02);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 32px;
-      transform-style: preserve-3d;
-      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-      overflow: hidden;
-    }
-    .card-3d::before{
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(0,240,255,.15), transparent 50%);
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-    .card-3d:hover::before{
-      opacity: 1;
-    }
-    .card-3d:hover{
-      transform: translateY(-10px) translateZ(20px);
-      border-color: rgba(0,240,255,.3);
-      box-shadow: 0 30px 60px rgba(0,0,0,.4), 0 0 40px rgba(0,240,255,.1);
-    }
-    .card-icon{
-      width: 60px;
-      height: 60px;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      border-radius: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 28px;
-      margin-bottom: 24px;
-      box-shadow: 0 10px 30px rgba(0,240,255,.3);
-    }
-    .card-3d h3{
-      font-size: 20px;
-      margin-bottom: 12px;
-    }
-    .card-3d p{
-      font-size: 14px;
-      color: var(--muted);
-      line-height: 1.7;
-    }
+/* FOOTER */
+footer{
+  position:relative;z-index:10;
+  padding:3rem 4rem;
+  border-top:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:1rem;
+}
+.footer-logo{
+  font-family:'Syne',sans-serif;
+  font-weight:800;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.footer-links{
+  display:flex;gap:2rem;list-style:none;
+}
+.footer-links a{
+  color:var(--muted);text-decoration:none;
+  font-size:0.85rem;transition:color 0.3s;
+}
+.footer-links a:hover{color:var(--text)}
+.footer-copy{font-size:0.8rem;color:var(--muted)}
 
-    /* Solutions Section with 3D Tilt */
-    .solutions-grid{
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 24px;
-    }
-    .solution-card{
-      background: rgba(255,255,255,.02);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 40px;
-      position: relative;
-      overflow: hidden;
-      transform-style: preserve-3d;
-      transition: transform 0.1s ease;
-    }
-    .solution-card::after{
-      content: '';
-      position: absolute;
-      inset: -2px;
-      background: linear-gradient(135deg, var(--accent), var(--accent2), var(--accent3));
-      border-radius: calc(var(--radius) + 2px);
-      z-index: -1;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-    .solution-card:hover::after{
-      opacity: 1;
-    }
-    .solution-card:hover{
-      transform: translateZ(30px);
-    }
-    .solution-card h3{
-      font-size: 24px;
-      margin-bottom: 24px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .solution-list{
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-    .solution-list li{
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      color: var(--muted);
-      font-size: 15px;
-    }
-    .check-icon{
-      width: 24px;
-      height: 24px;
-      background: rgba(0,240,255,.1);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--accent);
-      font-size: 12px;
-      flex-shrink: 0;
-    }
+/* DIVIDER */
+.section-divider{
+  position:relative;z-index:10;
+  height:1px;
+  background:linear-gradient(90deg,transparent,var(--border),transparent);
+  margin:0 4rem;
+}
 
-    /* Portfolio 3D Carousel */
-    .portfolio-3d{
-      display: flex;
-      gap: 30px;
-      perspective: 1000px;
-      overflow-x: auto;
-      padding: 40px 20px;
-      scroll-snap-type: x mandatory;
-    }
-    .portfolio-item{
-      flex: 0 0 380px;
-      height: 450px;
-      position: relative;
-      transform-style: preserve-3d;
-      transition: all 0.5s ease;
-      scroll-snap-align: center;
-    }
-    .portfolio-item:hover{
-      transform: rotateY(0deg) translateZ(50px) scale(1.05);
-    }
-    .portfolio-inner{
-      position: relative;
-      width: 100%;
-      height: 100%;
-      background: rgba(255,255,255,.03);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      overflow: hidden;
-      transform: rotateY(15deg);
-      transition: transform 0.5s ease;
-    }
-    .portfolio-item:hover .portfolio-inner{
-      transform: rotateY(0deg);
-    }
-    .portfolio-cover{
-      height: 220px;
-      background-size: cover;
-      background-position: center;
-      position: relative;
-    }
-    .portfolio-cover::after{
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(to bottom, transparent 0%, var(--bg) 100%);
-    }
-    .portfolio-content{
-      padding: 24px;
-    }
-    .portfolio-tag{
-      display: inline-block;
-      padding: 6px 14px;
-      background: rgba(0,240,255,.1);
-      border: 1px solid rgba(0,240,255,.3);
-      border-radius: 100px;
-      font-size: 11px;
-      color: var(--accent);
-      margin-bottom: 12px;
-    }
-    .portfolio-content h3{
-      font-size: 20px;
-      margin-bottom: 8px;
-    }
-    .portfolio-content p{
-      color: var(--muted);
-      font-size: 14px;
-    }
+/* WA FLOAT */
+.wa-float{
+  position:fixed;
+  bottom:2rem;right:2rem;
+  z-index:200;
+  width:56px;height:56px;
+  background:linear-gradient(135deg,#25d366,#128c7e);
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  text-decoration:none;font-size:1.5rem;
+  box-shadow:0 10px 40px rgba(37,211,102,0.4);
+  transition:transform 0.3s;
+  animation:wabounce 3s ease-in-out infinite;
+}
+@keyframes wabounce{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-8px)}
+}
+.wa-float:hover{transform:scale(1.1)!important}
 
-    /* Process Timeline 3D */
-    .process-timeline{
-      display: flex;
-      justify-content: space-between;
-      position: relative;
-      padding: 40px 0;
-    }
-    .process-timeline::before{
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 0;
-      right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent3));
-      transform: translateY(-50%);
-    }
-    .process-step{
-      width: 280px;
-      background: rgba(255,255,255,.03);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 32px;
-      position: relative;
-      transform-style: preserve-3d;
-      transition: all 0.5s ease;
-    }
-    .process-step:hover{
-      transform: translateY(-20px) translateZ(30px);
-      border-color: var(--accent);
-    }
-    .step-number{
-      width: 50px;
-      height: 50px;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      font-size: 20px;
-      color: #000;
-      margin-bottom: 20px;
-      box-shadow: 0 10px 30px rgba(0,240,255,.3);
-    }
+/* Reveal animation */
+.reveal{
+  opacity:0;transform:translateY(40px);
+  transition:opacity 0.8s ease,transform 0.8s ease;
+}
+.reveal.visible{opacity:1;transform:translateY(0)}
 
-    /* Ecosystem Orbit */
-    .ecosystem-orbit{
-      position: relative;
-      height: 600px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .orbit-center{
-      width: 200px;
-      height: 200px;
-      background: radial-gradient(circle, var(--accent), var(--accent2));
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      font-size: 18px;
-      color: #000;
-      box-shadow: 0 0 100px rgba(0,240,255,.5);
-      position: relative;
-      z-index: 10;
-    }
-    .orbit-ring{
-      position: absolute;
-      border: 1px solid rgba(255,255,255,.1);
-      border-radius: 50%;
-      animation: orbitRotate 20s linear infinite;
-    }
-    .orbit-ring:nth-child(2){ width: 400px; height: 400px; animation-duration: 30s; animation-direction: reverse; }
-    .orbit-ring:nth-child(3){ width: 600px; height: 600px; animation-duration: 40s; }
-    @keyframes orbitRotate{
-      from{transform: rotate(0deg)}
-      to{transform: rotate(360deg)}
-    }
-    .orbit-item{
-      position: absolute;
-      width: 120px;
-      height: 120px;
-      background: rgba(255,255,255,.05);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      font-size: 12px;
-      text-align: center;
-      backdrop-filter: blur(10px);
-      transition: all 0.3s ease;
-    }
-    .orbit-item:hover{
-      background: rgba(0,240,255,.1);
-      border-color: var(--accent);
-      transform: scale(1.1);
-    }
-
-    /* Contact 3D Form */
-    .contact-3d{
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 40px;
-      perspective: 1000px;
-    }
-    .form-3d{
-      background: rgba(255,255,255,.02);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 48px;
-      transform-style: preserve-3d;
-      transition: transform 0.5s ease;
-    }
-    .form-3d:hover{
-      transform: rotateY(-5deg) translateZ(20px);
-    }
-    .form-group{
-      margin-bottom: 24px;
-    }
-    .form-group label{
-      display: block;
-      margin-bottom: 8px;
-      font-size: 13px;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .form-input{
-      width: 100%;
-      padding: 16px 20px;
-      background: rgba(0,0,0,.3);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      color: white;
-      font-size: 15px;
-      transition: all 0.3s ease;
-    }
-    .form-input:focus{
-      outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 0 20px rgba(0,240,255,.2);
-    }
-    textarea.form-input{
-      min-height: 120px;
-      resize: vertical;
-    }
-
-    /* Footer */
-    footer{
-      padding: 60px 0;
-      border-top: 1px solid var(--border);
-      text-align: center;
-      position: relative;
-    }
-    .footer-glow{
-      position: absolute;
-      top: -100px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 600px;
-      height: 200px;
-      background: radial-gradient(ellipse, rgba(0,240,255,.2), transparent 70%);
-      pointer-events: none;
-    }
-
-    /* WhatsApp Float 3D */
-    .wa-float{
-      position: fixed;
-      right: 30px;
-      bottom: 30px;
-      z-index: 999;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 16px 24px;
-      background: linear-gradient(135deg, #25d366, #128c7e);
-      border-radius: 100px;
-      box-shadow: 0 10px 40px rgba(37,211,102,.4);
-      transform-style: preserve-3d;
-      transition: all 0.3s ease;
-      animation: waFloat 3s ease-in-out infinite;
-    }
-    @keyframes waFloat{
-      0%,100%{transform: translateY(0) translateZ(0)}
-      50%{transform: translateY(-10px) translateZ(20px)}
-    }
-    .wa-float:hover{
-      transform: translateY(-5px) scale(1.05);
-      box-shadow: 0 20px 60px rgba(37,211,102,.5);
-    }
-
-    /* Scroll Progress */
-    .scroll-progress{
-      position: fixed;
-      top: 0;
-      left: 0;
-      height: 3px;
-      background: linear-gradient(90deg, var(--accent), var(--accent2));
-      z-index: 9999;
-      transform-origin: left;
-      transform: scaleX(0);
-    }
-
-    /* Responsive */
-    @media (max-width: 1024px){
-      .hero-grid{ grid-template-columns: 1fr; text-align: center; }
-      .hero-3d-card{ height: 400px; }
-      h1{ font-size: 48px; }
-      .grid-3d{ grid-template-columns: repeat(2, 1fr); }
-      .solutions-grid{ grid-template-columns: 1fr; }
-      .contact-3d{ grid-template-columns: 1fr; }
-      .process-timeline{ flex-direction: column; gap: 40px; }
-      .process-timeline::before{ display: none; }
-    }
-    @media (max-width: 768px){
-      .nav-links{ display: none; }
-      h1{ font-size: 36px; }
-      .grid-3d{ grid-template-columns: 1fr; }
-      .hero-actions{ flex-direction: column; }
-      .trust-badges{ justify-content: center; }
-      body{ cursor: auto; }
-      .cursor, .cursor-dot{ display: none; }
-    }
-
-    /* Loading Screen */
-    .loader{
-      position: fixed;
-      inset: 0;
-      background: var(--bg);
-      z-index: 10000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      gap: 24px;
-      transition: opacity 0.5s ease, visibility 0.5s ease;
-    }
-    .loader.hidden{
-      opacity: 0;
-      visibility: hidden;
-    }
-    .loader-logo{
-      width: 100px;
-      height: 100px;
-      animation: loaderSpin 2s linear infinite;
-    }
-    @keyframes loaderSpin{
-      from{transform: rotate(0deg)}
-      to{transform: rotate(360deg)}
-    }
-    .loader-text{
-      font-size: 14px;
-      color: var(--muted);
-      letter-spacing: 2px;
-    }
-  </style>
+@media(max-width:900px){
+  nav{padding:1rem 1.5rem}
+  .nav-links{display:none}
+  section{padding:5rem 1.5rem}
+  #hero{padding:5rem 1.5rem 4rem;min-height:auto}
+  .floating-cards{display:none}
+  .process-steps{grid-template-columns:1fr 1fr;gap:2rem}
+  .process-steps::before{display:none}
+  footer{padding:2rem 1.5rem;flex-direction:column;text-align:center}
+  .footer-links{justify-content:center}
+  .contact-row{flex-direction:column}
+  .section-divider{margin:0 1.5rem}
+}
+</style>
 </head>
 <body>
 
-  <!-- Loading Screen -->
-  <div class="loader" id="loader">
-    <img src="https://raw.githubusercontent.com/jenderal45/exmind/main/img/Gemini_Generated_Image_e7jmb9e7jmb9e7jm-removebg-preview.png" class="loader-logo" alt="Loading">
-    <div class="loader-text">LOADING EXPERIENCE...</div>
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+<canvas id="bg"></canvas>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">EXMIND</div>
+  <ul class="nav-links">
+    <li><a href="#services">Services</a></li>
+    <li><a href="#ecosystem">Ecosystem</a></li>
+    <li><a href="#portfolio">Portfolio</a></li>
+    <li><a href="#process">Process</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a href="#contact" class="nav-cta">Free Consultation</a>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-content">
+    <div class="badge reveal"><span class="badge-dot"></span> One Stop Solution · Digital Technology</div>
+    <h1>
+      <span class="line1 reveal">Scale your</span>
+      <span class="line2 reveal">Digital Empire.</span>
+    </h1>
+    <p class="hero-sub reveal">Exmind Digital membantu bisnis UMKM, corporate, dan startup membangun ekosistem digital premium — website, iklan, social media, dan funnel penjualan yang benar-benar convert.</p>
+    <div class="hero-actions reveal">
+      <a href="https://wa.me/6287875101233" target="_blank" class="btn-primary">🚀 Free Strategy Call</a>
+      <a href="#portfolio" class="btn-ghost">Lihat Portfolio →</a>
+    </div>
+    <div class="hero-pills reveal">
+      <div class="pill"><span class="pill-icon">⚡</span>Fast Delivery</div>
+      <div class="pill"><span class="pill-icon">🔒</span>Secure & Maintainable</div>
+      <div class="pill"><span class="pill-icon">📈</span>Conversion Driven</div>
+    </div>
   </div>
 
-  <!-- Custom Cursor -->
-  <div class="cursor" id="cursor"></div>
-  <div class="cursor-dot" id="cursorDot"></div>
-
-  <!-- Scroll Progress -->
-  <div class="scroll-progress" id="scrollProgress"></div>
-
-  <!-- 3D Canvas Background -->
-  <div id="canvas-container"></div>
-
-  <!-- Navigation -->
-  <nav class="nav">
-    <div class="nav-inner">
-      <a href="#top" class="brand">
-        <img src="https://raw.githubusercontent.com/jenderal45/exmind/main/img/Gemini_Generated_Image_e7jmb9e7jmb9e7jm-removebg-preview.png" alt="Exmind">
-        <span>EXMIND DIGITAL</span>
-      </a>
-      <div class="nav-links">
-        <a href="#services">Services</a>
-        <a href="#solutions">Solutions</a>
-        <a href="#portfolio">Portfolio</a>
-        <a href="#process">Process</a>
-        <a href="#ecosystem">Ecosystem</a>
-        <a href="#contact">Contact</a>
-      </div>
-      <div class="nav-cta">
-        <button class="pill" onclick="toggleLang()">🌐 ID</button>
-        <a href="#contact" class="btn btn-primary">Free Consultation</a>
+  <div class="floating-cards">
+    <div class="fcard">
+      <div class="fcard-label">Projects Delivered</div>
+      <div class="fcard-val">50+</div>
+      <div class="sparkline">
+        <span style="height:40%"></span><span style="height:55%"></span><span style="height:45%"></span>
+        <span style="height:70%"></span><span style="height:60%"></span><span style="height:85%"></span>
+        <span style="height:100%"></span>
       </div>
     </div>
-  </nav>
-
-  <!-- Hero Section -->
-  <header class="hero" id="top">
-    <div class="hero-grid">
-      <div class="hero-content">
-        <div class="badge">
-          <span class="dot"></span>
-          <span>One Stop Solution for Enterprise</span>
-        </div>
-        <h1>Scale Your Business with 3D Digital Ecosystem</h1>
-        <p class="lead">
-          Exmind Digital membantu bisnis UMKM, corporate, dan startup membangun 
-          ekosistem digital interaktif dengan teknologi 3D modern, cepat, dan conversion-focused.
-        </p>
-        <div class="hero-actions">
-          <a href="#contact" class="btn btn-primary">
-            <span>Get Free Strategy Call</span>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M5 12h14M12 5l7 7-7 7"/>
-            </svg>
-          </a>
-          <a href="#portfolio" class="btn btn-ghost">See Our Work</a>
-        </div>
-        <div class="trust-badges">
-          <div class="trust-item">
-            <span>⚡</span>
-            <span>Fast Delivery</span>
-          </div>
-          <div class="trust-item">
-            <span>🔒</span>
-            <span>Secure & Maintainable</span>
-          </div>
-          <div class="trust-item">
-            <span>📈</span>
-            <span>Conversion Driven</span>
-          </div>
-        </div>
-      </div>
-      
-      <div class="hero-3d-wrapper">
-        <div class="hero-3d-card" id="heroCard">
-          <div class="card-3d-layer"></div>
-          <div class="card-3d-layer"></div>
-          <div class="card-3d-layer">
-            <div class="hologram-ring"></div>
-            <div class="hologram-ring"></div>
-            <img src="https://raw.githubusercontent.com/jenderal45/exmind/main/img/Gemini_Generated_Image_e7jmb9e7jmb9e7jm-removebg-preview.png" alt="Exmind 3D">
-            <p style="color: var(--muted); font-size: 14px; text-align: center;">
-              Interactive 3D Experience
-            </p>
-          </div>
-        </div>
-      </div>
+    <div class="fcard">
+      <div class="fcard-icon">🤖</div>
+      <div class="fcard-title">AI & Automation</div>
+      <div class="fcard-sub">Business AI ready at ai.exmind.co.id</div>
     </div>
-  </header>
-
-  <!-- Services Section -->
-  <section id="services">
-    <div class="container">
-      <div class="section-header">
-        <h2 class="section-title">Produk Utama</h2>
-        <p class="section-sub">Layanan inti Exmind Digital dengan sentuhan teknologi 3D interaktif</p>
-      </div>
-      <div class="grid-3d">
-        <div class="card-3d" data-tilt>
-          <div class="card-icon">📱</div>
-          <h3>Sosmed & E-commerce</h3>
-          <p>Strategi konten, desain feed, copywriting, admin, hingga reporting performa dengan visual 3D.</p>
-        </div>
-        <div class="card-3d" data-tilt>
-          <div class="card-icon">💻</div>
-          <h3>Website & Apps</h3>
-          <p>Landing page, company profile, web app dengan teknologi 3D interaktif dan animasi modern.</p>
-        </div>
-        <div class="card-3d" data-tilt>
-          <div class="card-icon">🎯</div>
-          <h3>Digital Ads</h3>
-          <p>Meta Ads, Google Ads, TikTok Ads dengan creative 3D yang meningkatkan engagement 250%.</p>
-        </div>
-        <div class="card-3d" data-tilt>
-          <div class="card-icon">🎥</div>
-          <h3>Live & Multimedia</h3>
-          <p>Produksi konten video, live streaming event, motion graphic 3D, dan editing profesional.</p>
-        </div>
-      </div>
+    <div class="fcard">
+      <div class="fcard-label">Response Time</div>
+      <div class="fcard-val">&lt;24h</div>
+      <div class="fcard-sub" style="font-size:0.75rem;color:var(--muted)">Garansi respon cepat</div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- Solutions Section -->
-  <section id="solutions">
-    <div class="container">
-      <div class="section-header">
-        <h2 class="section-title">One Stop Solution</h2>
-        <p class="section-sub">Solusi teknologi digital terintegrasi untuk pertumbuhan bisnis</p>
-      </div>
-      <div class="solutions-grid">
-        <div class="solution-card" data-tilt>
-          <h3>🌐 Website & Development</h3>
-          <ul class="solution-list">
-            <li><span class="check-icon">✓</span> Company Profile & Landing Page 3D</li>
-            <li><span class="check-icon">✓</span> E-Commerce & Custom Web App</li>
-            <li><span class="check-icon">✓</span> UI/UX, Maintenance, Security</li>
-          </ul>
-        </div>
-        <div class="solution-card" data-tilt>
-          <h3>🎨 Branding & Design</h3>
-          <ul class="solution-list">
-            <li><span class="check-icon">✓</span> Brand Strategy & Identity System</li>
-            <li><span class="check-icon">✓</span> Creative Asset & Motion Graphic</li>
-            <li><span class="check-icon">✓</span> 3D Animation & Visualization</li>
-          </ul>
-        </div>
-        <div class="solution-card" data-tilt>
-          <h3>📢 Social Media</h3>
-          <ul class="solution-list">
-            <li><span class="check-icon">✓</span> Content Planning & Calendar</li>
-            <li><span class="check-icon">✓</span> Copywriting & Community</li>
-            <li><span class="check-icon">✓</span> Performance Monitoring</li>
-          </ul>
-        </div>
-        <div class="solution-card" data-tilt>
-          <h3>🚀 Digital Marketing</h3>
-          <ul class="solution-list">
-            <li><span class="check-icon">✓</span> Meta, Google, TikTok Ads</li>
-            <li><span class="check-icon">✓</span> Conversion Funnel Strategy</li>
-            <li><span class="check-icon">✓</span> Campaign Performance Report</li>
-          </ul>
-        </div>
-      </div>
+<div class="section-divider"></div>
+
+<!-- SERVICES -->
+<section id="services">
+  <div class="section-label reveal">Layanan Utama</div>
+  <div class="section-title reveal">Semua yang kamu butuhkan<br>dalam satu atap.</div>
+  <p class="section-sub reveal">Dari strategi hingga eksekusi — kami tangani semuanya agar kamu fokus tumbuh.</p>
+
+  <div class="services-grid">
+    <div class="scard reveal">
+      <div class="scard-num">01</div>
+      <div class="scard-icon">🌐</div>
+      <div class="scard-title">Website & Aplikasi</div>
+      <div class="scard-desc">Landing page, company profile, web app, UI/UX, maintenance & security. Speed optimized, SEO ready.</div>
     </div>
-  </section>
-
-  <!-- Portfolio Section -->
-  <section id="portfolio">
-    <div class="container">
-      <div class="section-header">
-        <h2 class="section-title">Portfolio 3D</h2>
-        <p class="section-sub">Project interaktif yang telah kami kerjakan</p>
-      </div>
-      <div class="portfolio-3d">
-        <div class="portfolio-item">
-          <div class="portfolio-inner">
-            <div class="portfolio-cover" style="background-image: url('https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80')"></div>
-            <div class="portfolio-content">
-              <span class="portfolio-tag">Organization</span>
-              <h3>Hippi Jakarta Timur</h3>
-              <p>Website 3D interaktif untuk organisasi pemuda</p>
-            </div>
-          </div>
-        </div>
-        <div class="portfolio-item">
-          <div class="portfolio-inner">
-            <div class="portfolio-cover" style="background-image: url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80')"></div>
-            <div class="portfolio-content">
-              <span class="portfolio-tag">Automotive</span>
-              <h3>NKI Global Perkasa</h3>
-              <p>Platform 3D showcase untuk industri forklift</p>
-            </div>
-          </div>
-        </div>
-        <div class="portfolio-item">
-          <div class="portfolio-inner">
-            <div class="portfolio-cover" style="background-image: url('https://images.unsplash.com/photo-1553877522-43269d4ea984?auto=format&fit=crop&w=800&q=80')"></div>
-            <div class="portfolio-content">
-              <span class="portfolio-tag">Technology</span>
-              <h3>Andalan Kreasi Usaha</h3>
-              <p>Corporate website dengan animasi 3D</p>
-            </div>
-          </div>
-        </div>
-        <div class="portfolio-item">
-          <div class="portfolio-inner">
-            <div class="portfolio-cover" style="background-image: url('https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=800&q=80')"></div>
-            <div class="portfolio-content">
-              <span class="portfolio-tag">Healthcare</span>
-              <h3>Azuri Dental</h3>
-              <p>Virtual tour 3D untuk klinik gigi</p>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div class="scard reveal">
+      <div class="scard-num">02</div>
+      <div class="scard-icon">📱</div>
+      <div class="scard-title">Social Media & E-commerce</div>
+      <div class="scard-desc">Strategi konten, desain feed, copywriting, admin toko, hingga reporting performa bulanan.</div>
     </div>
-  </section>
-
-  <!-- Process Section -->
-  <section id="process">
-    <div class="container">
-      <div class="section-header">
-        <h2 class="section-title">How We Work</h2>
-        <p class="section-sub">Proses kerja cepat, transparan, dan terukur</p>
-      </div>
-      <div class="process-timeline">
-        <div class="process-step">
-          <div class="step-number">01</div>
-          <h3>Audit & Strategy</h3>
-          <p>Mapping tujuan bisnis, target market, dan KPI dengan analisis 3D data visualization.</p>
-        </div>
-        <div class="process-step">
-          <div class="step-number">02</div>
-          <h3>Design & Copy</h3>
-          <p>UI/UX + copywriting dibuat untuk conversion dengan prototype 3D interaktif.</p>
-        </div>
-        <div class="process-step">
-          <div class="step-number">03</div>
-          <h3>Build & Launch</h3>
-          <p>Development cepat dengan teknologi 3D modern, SEO ready, speed optimized.</p>
-        </div>
-        <div class="process-step">
-          <div class="step-number">04</div>
-          <h3>Optimize & Scale</h3>
-          <p>Tracking real-time, report 3D dashboard, dan scaling campaign.</p>
-        </div>
-      </div>
+    <div class="scard reveal">
+      <div class="scard-num">03</div>
+      <div class="scard-icon">🎯</div>
+      <div class="scard-title">Digital Advertising</div>
+      <div class="scard-desc">Meta Ads, Google Ads, TikTok Ads, retargeting strategy, dan conversion funnel yang terukur.</div>
     </div>
-  </section>
-
-  <!-- Ecosystem Section -->
-  <section id="ecosystem">
-    <div class="container">
-      <div class="section-header">
-        <h2 class="section-title">Digital Ecosystem</h2>
-        <p class="section-sub">Integrated business operating system dengan teknologi 3D</p>
-      </div>
-      <div class="ecosystem-orbit">
-        <div class="orbit-ring">
-          <div class="orbit-item" style="top: -60px; left: 50%; transform: translateX(-50%);">
-            <span>☁️</span>
-            <span>Cloud</span>
-          </div>
-        </div>
-        <div class="orbit-ring">
-          <div class="orbit-item" style="top: 50%; right: -60px; transform: translateY(-50%);">
-            <span>🤖</span>
-            <span>AI System</span>
-          </div>
-          <div class="orbit-item" style="bottom: -60px; left: 50%; transform: translateX(-50%);">
-            <span>💳</span>
-            <span>Payment</span>
-          </div>
-        </div>
-        <div class="orbit-ring">
-          <div class="orbit-item" style="top: 50%; left: -60px; transform: translateY(-50%);">
-            <span>📊</span>
-            <span>ERP</span>
-          </div>
-          <div class="orbit-item" style="top: -60px; right: 20%;">
-            <span>👥</span>
-            <span>CRM</span>
-          </div>
-          <div class="orbit-item" style="bottom: -60px; right: 20%;">
-            <span>🛒</span>
-            <span>Commerce</span>
-          </div>
-        </div>
-        <div class="orbit-center">
-          EXMIND<br>HUB
-        </div>
-      </div>
+    <div class="scard reveal">
+      <div class="scard-num">04</div>
+      <div class="scard-icon">🎨</div>
+      <div class="scard-title">Branding & Creative</div>
+      <div class="scard-desc">Brand strategy, logo, brand identity system, motion graphic, dan semua creative asset.</div>
     </div>
-  </section>
-
-  <!-- Contact Section -->
-  <section id="contact">
-    <div class="container">
-      <div class="section-header">
-        <h2 class="section-title">Start Project</h2>
-        <p class="section-sub">Ceritakan kebutuhanmu, kami bantu wujudkan dalam bentuk 3D interaktif</p>
-      </div>
-      <div class="contact-3d">
-        <div class="form-3d">
-          <h3 style="margin-bottom: 32px; font-size: 24px;">Request Proposal 3D</h3>
-          <form onsubmit="return sendWA(event)">
-            <div class="form-group">
-              <label>Nama Lengkap</label>
-              <input type="text" class="form-input" placeholder="John Doe" required>
-            </div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-              <div class="form-group">
-                <label>Email</label>
-                <input type="email" class="form-input" placeholder="john@company.com" required>
-              </div>
-              <div class="form-group">
-                <label>Company</label>
-                <input type="text" class="form-input" placeholder="Company Name">
-              </div>
-            </div>
-            <div class="form-group">
-              <label>Kebutuhan Project</label>
-              <textarea class="form-input" placeholder="Ceritakan kebutuhan 3D interaktif Anda..." required></textarea>
-            </div>
-            <button type="submit" class="btn btn-primary" style="width: 100%;">
-              Send to WhatsApp
-            </button>
-          </form>
-        </div>
-        <div class="form-3d" style="background: linear-gradient(135deg, rgba(0,240,255,.05), rgba(188,19,254,.05));">
-          <h3 style="margin-bottom: 24px; font-size: 24px;">Contact Info</h3>
-          <div style="display: flex; flex-direction: column; gap: 24px;">
-            <div style="display: flex; align-items: center; gap: 16px;">
-              <div style="width: 50px; height: 50px; background: rgba(0,240,255,.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px;">
-                📱
-              </div>
-              <div>
-                <div style="color: var(--muted); font-size: 13px;">WhatsApp</div>
-                <div style="font-weight: 600;">+62 878-7510-1233</div>
-              </div>
-            </div>
-            <div style="display: flex; align-items: center; gap: 16px;">
-              <div style="width: 50px; height: 50px; background: rgba(188,19,254,.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px;">
-                📧
-              </div>
-              <div>
-                <div style="color: var(--muted); font-size: 13px;">Email</div>
-                <div style="font-weight: 600;">hello@exmind.co.id</div>
-              </div>
-            </div>
-            <div style="display: flex; align-items: center; gap: 16px;">
-              <div style="width: 50px; height: 50px; background: rgba(255,0,110,.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px;">
-                📍
-              </div>
-              <div>
-                <div style="color: var(--muted); font-size: 13px;">Location</div>
-                <div style="font-weight: 600;">Jakarta, Indonesia</div>
-              </div>
-            </div>
-          </div>
-          <div style="margin-top: 40px; padding-top: 32px; border-top: 1px solid var(--border);">
-            <p style="color: var(--muted); font-size: 14px; line-height: 1.8;">
-              Enterprise Ready: Multi-language, CMS ready, branding guideline, 
-              dan struktur company profile dengan teknologi 3D WebGL.
-            </p>
-          </div>
-        </div>
-      </div>
+    <div class="scard reveal">
+      <div class="scard-num">05</div>
+      <div class="scard-icon">🎬</div>
+      <div class="scard-title">Live Streaming & Video</div>
+      <div class="scard-desc">Produksi video, live streaming event, motion graphic, dan editing profesional.</div>
     </div>
-  </section>
+    <div class="scard reveal">
+      <div class="scard-num">06</div>
+      <div class="scard-icon">🤖</div>
+      <div class="scard-title">AI & Automation</div>
+      <div class="scard-desc">Business AI, automation workflows, CRM, ERP, dan sistem operasional terintegrasi.</div>
+    </div>
+  </div>
+</section>
 
-  <!-- Footer -->
-  <footer>
-    <div class="footer-glow"></div>
-    <div class="container">
-      <img src="https://raw.githubusercontent.com/jenderal45/exmind/main/img/Gemini_Generated_Image_e7jmb9e7jmb9e7jm-removebg-preview.png" style="width: 60px; margin-bottom: 24px; filter: drop-shadow(0 0 20px rgba(0,240,255,.4));" alt="">
-      <h3 style="margin-bottom: 16px;">Exmind Digital</h3>
-      <p style="color: var(--muted); margin-bottom: 24px;">
-        Member of Astria Group | One Stop Solution Digital Technology
-      </p>
-      <div style="display: flex; gap: 24px; justify-content: center; margin-bottom: 32px;">
-        <a href="#" style="color: var(--muted); transition: color 0.3s;">Services</a>
-        <a href="#" style="color: var(--muted); transition: color 0.3s;">Portfolio</a>
-        <a href="#" style="color: var(--muted); transition: color 0.3s;">Contact</a>
+<div class="section-divider"></div>
+
+<!-- ECOSYSTEM -->
+<section id="ecosystem">
+  <div class="section-label reveal">Exmind Ecosystem</div>
+  <div class="section-title reveal">Integrated Business<br>Operating System.</div>
+  <p class="section-sub reveal">Semua sistem bisnis terhubung dalam satu ekosistem scalable — dari HR hingga AI, dari Finance hingga Commerce.</p>
+
+  <div class="ecosystem-wrapper reveal">
+    <div class="eco-ring"></div>
+    <div class="eco-ring"></div>
+    <div class="eco-ring"></div>
+    <div class="eco-center">
+      <div class="eco-center-title">EXMIND</div>
+      <div class="eco-center-sub">Core Platform</div>
+    </div>
+    <div class="eco-nodes" id="ecoNodes"></div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- PORTFOLIO -->
+<section id="portfolio">
+  <div class="section-label reveal">Portfolio</div>
+  <div class="section-title reveal">Project yang sudah<br>kami bangun.</div>
+
+  <div class="portfolio-grid">
+    <a href="https://hippijaktim.or.id" target="_blank" class="pcard reveal">
+      <div class="pcard-cat">Organization</div>
+      <div class="pcard-name">Hippi Jakarta Timur</div>
+      <div class="pcard-url">hippijaktim.or.id</div>
+      <div class="pcard-arrow">↗</div>
+    </a>
+    <a href="https://nkiglobalperkasa.co.id" target="_blank" class="pcard reveal">
+      <div class="pcard-cat">Service Forklift</div>
+      <div class="pcard-name">NKI Global Perkasa</div>
+      <div class="pcard-url">nkiglobalperkasa.co.id</div>
+      <div class="pcard-arrow">↗</div>
+    </a>
+    <a href="https://andalankreasiusaha.co.id" target="_blank" class="pcard reveal">
+      <div class="pcard-cat">IT & Automotive</div>
+      <div class="pcard-name">Andalan Kreasi Usaha</div>
+      <div class="pcard-url">andalankreasiusaha.co.id</div>
+      <div class="pcard-arrow">↗</div>
+    </a>
+    <a href="https://oerusin.id" target="_blank" class="pcard reveal">
+      <div class="pcard-cat">Business</div>
+      <div class="pcard-name">Oerusin</div>
+      <div class="pcard-url">oerusin.id</div>
+      <div class="pcard-arrow">↗</div>
+    </a>
+    <a href="https://azuridental.com" target="_blank" class="pcard reveal">
+      <div class="pcard-cat">Healthcare</div>
+      <div class="pcard-name">Azuri Dental</div>
+      <div class="pcard-url">azuridental.com</div>
+      <div class="pcard-arrow">↗</div>
+    </a>
+    <a href="https://rifkiauliyalawfirm.com" target="_blank" class="pcard reveal">
+      <div class="pcard-cat">Law Firm</div>
+      <div class="pcard-name">Rifki Auliya Law Firm</div>
+      <div class="pcard-url">rifkiauliyalawfirm.com</div>
+      <div class="pcard-arrow">↗</div>
+    </a>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- PROCESS -->
+<section id="process">
+  <div class="section-label reveal">Cara Kami Bekerja</div>
+  <div class="section-title reveal">Proses cepat, transparan,<br>dan terukur.</div>
+
+  <div class="process-steps">
+    <div class="pstep reveal">
+      <div class="pstep-num">1</div>
+      <div class="pstep-title">Audit & Strategy</div>
+      <div class="pstep-desc">Mapping tujuan bisnis, target market, dan KPI yang jelas dan terukur.</div>
+    </div>
+    <div class="pstep reveal">
+      <div class="pstep-num">2</div>
+      <div class="pstep-title">Design & Copy</div>
+      <div class="pstep-desc">UI/UX + copywriting dibuat khusus untuk conversion dan engagement.</div>
+    </div>
+    <div class="pstep reveal">
+      <div class="pstep-num">3</div>
+      <div class="pstep-title">Build & Launch</div>
+      <div class="pstep-desc">Development cepat, SEO ready, speed optimized, dan siap deploy.</div>
+    </div>
+    <div class="pstep reveal">
+      <div class="pstep-num">4</div>
+      <div class="pstep-title">Optimize & Scale</div>
+      <div class="pstep-desc">Tracking performa, laporan berkala, dan scaling campaign yang efektif.</div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="contact-inner">
+    <div class="section-label reveal">Hubungi Kami</div>
+    <div class="section-title reveal">Ceritakan kebutuhanmu.<br>Kami susunkan strateginya.</div>
+    <p class="section-sub reveal" style="margin:0 auto 0;text-align:center">Respon maksimal 1×24 jam. Bisa request NDA untuk project corporate.</p>
+
+    <div class="contact-info reveal">
+      <div class="cinfo-item"><div class="cinfo-icon">📱</div>+62 878-7510-1233</div>
+      <div class="cinfo-item"><div class="cinfo-icon">📸</div>@exminddigital</div>
+      <div class="cinfo-item"><div class="cinfo-icon">🌐</div>www.exmind.co.id</div>
+    </div>
+
+    <div class="contact-form reveal" id="contactForm">
+      <div class="contact-row">
+        <input type="text" placeholder="Nama Kamu" id="fname">
+        <input type="text" placeholder="Nama Bisnis" id="fbiz">
       </div>
-      <p style="color: var(--muted2); font-size: 13px;">
-        © 2026 Exmind Digital. All rights reserved.
-      </p>
+      <input type="tel" placeholder="Nomor WhatsApp (+62...)" id="fphone">
+      <textarea placeholder="Ceritakan kebutuhanmu — website, iklan, social media, branding, atau lainnya..." id="fmsg"></textarea>
+      <button onclick="sendWA()" class="btn-primary" style="align-self:flex-start;cursor:none;border:none;">Kirim via WhatsApp →</button>
     </div>
-  </footer>
+  </div>
+</section>
 
-  <!-- WhatsApp Float -->
-  <a href="https://wa.me/6287875101233" class="wa-float" target="_blank">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
-      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-    </svg>
-    <div>
-      <div style="font-weight: 600; font-size: 14px;">Chat WhatsApp</div>
-      <div style="font-size: 12px; opacity: 0.9;">Fast Response</div>
-    </div>
-  </a>
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">EXMIND DIGITAL</div>
+  <ul class="footer-links">
+    <li><a href="#services">Services</a></li>
+    <li><a href="#portfolio">Portfolio</a></li>
+    <li><a href="#ecosystem">Ecosystem</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <div class="footer-copy">© 2025 Exmind Digital · Member of Astria Group</div>
+</footer>
 
-  <script>
-    // Loading Screen
-    window.addEventListener('load', () => {
-      setTimeout(() => {
-        document.getElementById('loader').classList.add('hidden');
-      }, 1500);
-    });
+<a href="https://wa.me/6287875101233" target="_blank" class="wa-float">💬</a>
 
-    // Custom Cursor
-    const cursor = document.getElementById('cursor');
-    const cursorDot = document.getElementById('cursorDot');
-    
-    document.addEventListener('mousemove', (e) => {
-      cursor.style.left = e.clientX - 10 + 'px';
-      cursor.style.top = e.clientY - 10 + 'px';
-      cursorDot.style.left = e.clientX - 3 + 'px';
-      cursorDot.style.top = e.clientY - 3 + 'px';
-    });
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// CURSOR
+const cursor=document.getElementById('cursor');
+const ring=document.getElementById('cursor-ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{
+  mx=e.clientX;my=e.clientY;
+  cursor.style.left=mx-6+'px';
+  cursor.style.top=my-6+'px';
+});
+setInterval(()=>{
+  rx+=(mx-rx-20)*0.12;
+  ry+=(my-ry-20)*0.12;
+  ring.style.left=rx+'px';
+  ring.style.top=ry+'px';
+},16);
+document.querySelectorAll('a,button,.scard,.pcard,.eco-node,.nav-cta,.btn-primary,.btn-ghost').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{
+    cursor.style.transform='scale(2.5)';
+    cursor.style.background='var(--accent2)';
+  });
+  el.addEventListener('mouseleave',()=>{
+    cursor.style.transform='scale(1)';
+    cursor.style.background='var(--accent)';
+  });
+});
 
-    document.querySelectorAll('a, button, .card-3d, .solution-card').forEach(el => {
-      el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
-      el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
-    });
+// THREE.JS BACKGROUND
+const canvas=document.getElementById('bg');
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+renderer.setSize(window.innerWidth,window.innerHeight);
 
-    // Scroll Progress
-    gsap.registerPlugin(ScrollTrigger);
-    
-    gsap.to('#scrollProgress', {
-      scaleX: 1,
-      ease: 'none',
-      scrollTrigger: {
-        trigger: 'body',
-        start: 'top top',
-        end: 'bottom bottom',
-        scrub: 0.3
-      }
-    });
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(60,window.innerWidth/window.innerHeight,0.1,1000);
+camera.position.set(0,0,30);
 
-    // Three.js Particle System
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    document.getElementById('canvas-container').appendChild(renderer.domElement);
+// Particles
+const pgeo=new THREE.BufferGeometry();
+const N=800;
+const pos=new Float32Array(N*3);
+const col=new Float32Array(N*3);
+for(let i=0;i<N;i++){
+  pos[i*3]=(Math.random()-0.5)*100;
+  pos[i*3+1]=(Math.random()-0.5)*100;
+  pos[i*3+2]=(Math.random()-0.5)*60;
+  const c=Math.random();
+  if(c<0.33){col[i*3]=0.42;col[i*3+1]=0.39;col[i*3+2]=1}
+  else if(c<0.66){col[i*3]=1;col[i*3+1]=0.42;col[i*3+2]=0.62}
+  else{col[i*3]=0;col[i*3+1]=0.83;col[i*3+2]=0.67}
+}
+pgeo.setAttribute('position',new THREE.BufferAttribute(pos,3));
+pgeo.setAttribute('color',new THREE.BufferAttribute(col,3));
+const pmat=new THREE.PointsMaterial({size:0.18,vertexColors:true,transparent:true,opacity:0.7});
+const particles=new THREE.Points(pgeo,pmat);
+scene.add(particles);
 
-    // Particles
-    const particlesGeometry = new THREE.BufferGeometry();
-    const particlesCount = 1500;
-    const posArray = new Float32Array(particlesCount * 3);
-    const colorArray = new Float32Array(particlesCount * 3);
+// Floating Torus
+const tmat=new THREE.MeshBasicMaterial({color:0x6c63ff,wireframe:true,transparent:true,opacity:0.08});
+const tori=[];
+for(let i=0;i<3;i++){
+  const t=new THREE.Mesh(new THREE.TorusGeometry(6+i*4,0.05,8,60),tmat);
+  t.rotation.x=Math.random()*Math.PI;
+  t.rotation.y=Math.random()*Math.PI;
+  scene.add(t);tori.push(t);
+}
 
-    for(let i = 0; i < particlesCount * 3; i += 3) {
-      posArray[i] = (Math.random() - 0.5) * 50;
-      posArray[i+1] = (Math.random() - 0.5) * 50;
-      posArray[i+2] = (Math.random() - 0.5) * 50;
-      
-      // Cyan to Purple gradient colors
-      colorArray[i] = Math.random() * 0.5 + 0.5;     // R
-      colorArray[i+1] = Math.random() * 0.8 + 0.2;   // G
-      colorArray[i+2] = 1;                           // B
+// Grid plane
+const gmat=new THREE.MeshBasicMaterial({color:0x6c63ff,transparent:true,opacity:0.03,wireframe:true});
+const grid=new THREE.Mesh(new THREE.PlaneGeometry(120,80,30,20),gmat);
+grid.position.z=-20;
+scene.add(grid);
+
+let mouseX=0,mouseY=0;
+document.addEventListener('mousemove',e=>{
+  mouseX=(e.clientX/window.innerWidth-0.5)*2;
+  mouseY=(e.clientY/window.innerHeight-0.5)*2;
+});
+
+window.addEventListener('resize',()=>{
+  renderer.setSize(window.innerWidth,window.innerHeight);
+  camera.aspect=window.innerWidth/window.innerHeight;
+  camera.updateProjectionMatrix();
+});
+
+let t=0;
+function animate(){
+  requestAnimationFrame(animate);
+  t+=0.005;
+  particles.rotation.y=t*0.05;
+  particles.rotation.x=t*0.02;
+  tori.forEach((tor,i)=>{
+    tor.rotation.x+=0.003*(i+1)*0.5;
+    tor.rotation.y+=0.004*(i+1)*0.3;
+  });
+  camera.position.x+=(mouseX*3-camera.position.x)*0.02;
+  camera.position.y+=(-mouseY*2-camera.position.y)*0.02;
+  camera.lookAt(scene.position);
+  renderer.render(scene,camera);
+}
+animate();
+
+// ECOSYSTEM NODES
+const ecoData=[
+  {tag:'HR',name:'Absensi',top:'12%',left:'50%'},
+  {tag:'Core',name:'ERP',top:'28%',left:'80%'},
+  {tag:'Sales',name:'CRM',top:'52%',left:'85%'},
+  {tag:'Finance',name:'Accounting',top:'75%',left:'70%'},
+  {tag:'Payment',name:'Pay Gateway',top:'82%',left:'38%'},
+  {tag:'AI',name:'Business AI',top:'68%',left:'16%'},
+  {tag:'Commerce',name:'Marketplace',top:'42%',left:'8%'},
+  {tag:'Infra',name:'Cloud',top:'20%',left:'22%'},
+];
+const enodesEl=document.getElementById('ecoNodes');
+ecoData.forEach(d=>{
+  const el=document.createElement('div');
+  el.className='eco-node';
+  el.style.top=d.top;el.style.left=d.left;
+  el.innerHTML=`<div class="eco-node-tag">${d.tag}</div><div class="eco-node-name">${d.name}</div>`;
+  enodesEl.appendChild(el);
+});
+
+// REVEAL ON SCROLL
+const reveals=document.querySelectorAll('.reveal');
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach((e,i)=>{
+    if(e.isIntersecting){
+      setTimeout(()=>e.target.classList.add('visible'),i*80);
     }
+  });
+},{threshold:0.1});
+reveals.forEach(r=>obs.observe(r));
 
-    particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-    particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colorArray, 3));
-
-    const particlesMaterial = new THREE.PointsMaterial({
-      size: 0.05,
-      vertexColors: true,
-      transparent: true,
-      opacity: 0.8,
-      blending: THREE.AdditiveBlending
-    });
-
-    const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
-    scene.add(particlesMesh);
-
-    camera.position.z = 30;
-
-    // Mouse interaction for particles
-    let mouseX = 0;
-    let mouseY = 0;
-
-    document.addEventListener('mousemove', (event) => {
-      mouseX = (event.clientX / window.innerWidth) * 2 - 1;
-      mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
-    });
-
-    // Animation loop
-    function animate() {
-      requestAnimationFrame(animate);
-      
-      particlesMesh.rotation.x += 0.0005;
-      particlesMesh.rotation.y += 0.0005;
-      
-      // Mouse parallax
-      particlesMesh.rotation.x += mouseY * 0.0005;
-      particlesMesh.rotation.y += mouseX * 0.0005;
-      
-      renderer.render(scene, camera);
-    }
-    animate();
-
-    // Resize handler
-    window.addEventListener('resize', () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    });
-
-    // 3D Tilt Effect for Cards
-    document.querySelectorAll('[data-tilt]').forEach(card => {
-      card.addEventListener('mousemove', (e) => {
-        const rect = card.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
-        
-        const rotateX = (y - centerY) / 10;
-        const rotateY = (centerX - x) / 10;
-        
-        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(20px)`;
-        
-        // Update CSS variables for glow effect
-        card.style.setProperty('--mouse-x', `${(x / rect.width) * 100}%`);
-        card.style.setProperty('--mouse-y', `${(y / rect.height) * 100}%`);
-      });
-      
-      card.addEventListener('mouseleave', () => {
-        card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateZ(0)';
-      });
-    });
-
-    // Hero Card 3D Mouse Follow
-    const heroCard = document.getElementById('heroCard');
-    document.addEventListener('mousemove', (e) => {
-      const x = (window.innerWidth / 2 - e.pageX) / 50;
-      const y = (window.innerHeight / 2 - e.pageY) / 50;
-      heroCard.style.transform = `rotateY(${x}deg) rotateX(${y}deg)`;
-    });
-
-    // GSAP Scroll Animations
-    gsap.from('.section-title', {
-      scrollTrigger: {
-        trigger: '.section-title',
-        start: 'top 80%',
-        toggleActions: 'play none none reverse'
-      },
-      y: 50,
-      opacity: 0,
-      duration: 1,
-      ease: 'power3.out'
-    });
-
-    gsap.from('.card-3d', {
-      scrollTrigger: {
-        trigger: '.grid-3d',
-        start: 'top 80%',
-      },
-      y: 100,
-      opacity: 0,
-      duration: 0.8,
-      stagger: 0.2,
-      ease: 'power3.out'
-    });
-
-    gsap.from('.solution-card', {
-      scrollTrigger: {
-        trigger: '.solutions-grid',
-        start: 'top 80%',
-      },
-      y: 80,
-      opacity: 0,
-      duration: 0.8,
-      stagger: 0.15,
-      ease: 'power3.out'
-    });
-
-    gsap.from('.portfolio-item', {
-      scrollTrigger: {
-        trigger: '.portfolio-3d',
-        start: 'top 80%',
-      },
-      x: 100,
-      opacity: 0,
-      duration: 0.8,
-      stagger: 0.2,
-      ease: 'power3.out'
-    });
-
-    gsap.from('.process-step', {
-      scrollTrigger: {
-        trigger: '.process-timeline',
-        start: 'top 80%',
-      },
-      y: 60,
-      opacity: 0,
-      duration: 0.8,
-      stagger: 0.2,
-      ease: 'power3.out'
-    });
-
-    // WhatsApp Form Handler
-    function sendWA(e) {
-      e.preventDefault();
-      const msg = `Halo Exmind Digital 👋\n\nSaya tertarik dengan layanan 3D Interactive Website.\n\nMohon info lebih lanjut.`;
-      window.open(`https://wa.me/6287875101233?text=${encodeURIComponent(msg)}`, '_blank');
-      return false;
-    }
-
-    // Language Toggle
-    let lang = 'id';
-    function toggleLang() {
-      lang = lang === 'id' ? 'en' : 'id';
-      document.querySelector('.pill').textContent = `🌐 ${lang.toUpperCase()}`;
-    }
-
-    // Smooth scroll for nav links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-      anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if(target) {
-          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      });
-    });
-  </script>
+// WA FORM
+function sendWA(){
+  const name=document.getElementById('fname').value||'';
+  const biz=document.getElementById('fbiz').value||'';
+  const phone=document.getElementById('fphone').value||'';
+  const msg=document.getElementById('fmsg').value||'';
+  const text=`Halo Exmind Digital!\n\nNama: ${name}\nBisnis: ${biz}\nHP: ${phone}\n\n${msg}`;
+  window.open('https://wa.me/6287875101233?text='+encodeURIComponent(text),'_blank');
+}
+</script>
 </body>
 </html>
